@@ -14,3 +14,4 @@ data class TodoListDTO(
     @field:NotEmpty(message = "Writer cannot be empty.")
     val writer: String
 )
+

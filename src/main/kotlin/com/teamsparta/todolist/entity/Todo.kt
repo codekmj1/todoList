@@ -7,7 +7,7 @@ import jakarta.persistence.Id
 import java.time.LocalDateTime
 
 @Entity
-data class TodoList(
+data class Todo(
     @Id @GeneratedValue
     val id: Long?,
 
@@ -23,3 +23,4 @@ data class TodoList(
     @Column(nullable = false)
     var createdDate: LocalDateTime = LocalDateTime.now()
 )
+

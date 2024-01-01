@@ -1,12 +1,14 @@
 package com.teamsparta.todolist.service
 
 import com.teamsparta.todolist.dto.TodoListDTO
-import com.teamsparta.todolist.entity.TodoList
+import com.teamsparta.todolist.entity.Todo
 
 interface TodoListService {
-    fun createTodoList(todoListDTO: TodoListDTO): TodoList
-    fun getTodoList(id: Long): TodoList
-    fun getAllTodoList(): List<TodoList>
-    fun updateTodoList(id: Long, todoListDTO: TodoListDTO): TodoList
+    fun createTodoList(todoListDTO: TodoListDTO): Todo
+    fun getTodoList(id: Long): Todo
+    fun getAllTodoList(): List<Todo>
+    fun updateTodoList(id: Long, todoListDTO: TodoListDTO): Todo
     fun deleteTodoList(id: Long)
 }
+
+
