@@ -21,6 +21,9 @@ data class Todo(
     var writer: String,
 
     @Column(nullable = false)
-    var createdDate: LocalDateTime = LocalDateTime.now()
+    var createdDate: LocalDateTime = LocalDateTime.now(),
+
+    @Column(nullable = false)
+    var completed: Boolean = false
 )
 
