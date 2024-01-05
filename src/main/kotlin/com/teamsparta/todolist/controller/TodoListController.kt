@@ -1,11 +1,14 @@
 package com.teamsparta.todolist.controller
 
+import com.teamsparta.todolist.dto.CommentDTO
 import com.teamsparta.todolist.dto.TodoListDTO
+import com.teamsparta.todolist.entity.Comment
 import com.teamsparta.todolist.entity.Todo
 import com.teamsparta.todolist.service.TodoListService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+
 
 @RestController
 @RequestMapping("/api/todolist")
@@ -39,5 +42,30 @@ class TodoListController(private val todoListService: TodoListService) {
         todoListService.deleteTodoList(id)
         return ResponseEntity(HttpStatus.NO_CONTENT)
     }
+    //완료 처리
+    @PutMapping("/{id}/complete")
+    fun completeTodoList(@PathVariable id: Long): ResponseEntity<Todo> {
+        val completedTodoList = todoListService.completeTodoList(id)
+        return ResponseEntity(completedTodoList, HttpStatus.OK)
+    }
+    //댓글
+    @PostMapping("/{id}/comments")
+    fun createComment(@PathVariable id: Long, @RequestBody commentDTO: CommentDTO): ResponseEntity<Comment> {
+        val comment = todoListService.createComment(id, commentDTO)
+        return ResponseEntity(comment, HttpStatus.CREATED)
+    }
+
+    @PutMapping("/comments/{id}")
+    fun updateComment(@PathVariable id: Long, @RequestBody commentDTO: CommentDTO): ResponseEntity<Comment> {
+        val updatedComment = todoListService.updateComment(id, commentDTO)
+        return ResponseEntity(updatedComment, HttpStatus.OK)
+    }
+
+    @DeleteMapping("/comments/{id}")
+    fun deleteComment(@PathVariable id: Long, @RequestBody commentDTO: CommentDTO): ResponseEntity<Void> {
+        todoListService.deleteComment(id, commentDTO)
+        return ResponseEntity(HttpStatus.NO_CONTENT)
+    }
+
 }
 

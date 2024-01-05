@@ -14,6 +14,12 @@ class TodoListExceptionHandler {
     fun handleIllegalArgumentException(exception: IllegalArgumentException): String {
         return exception.message.toString()
     }
+    // 비밀번호 예외 처리
+    @ExceptionHandler(PasswordNotMatchException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handlePasswordNotMatchException(exception: PasswordNotMatchException): String {
+        return exception.message.toString()
+    }
 }
 
 
