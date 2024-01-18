@@ -7,8 +7,8 @@ Jwt를 사용하여 인증 / 인가 기능 구현한 TodoList 기능<br>
 <br>
 
 ✨기능<br>
-🧑User : 로그인, 로그아웃
-🧑Todos : 할일 목록 작성, 수정, 삭제
+🧑User : 로그인, 로그아웃<br>
+🧑Todos : 할일 목록 작성, 수정, 삭제<br>
 🧑Comments : 댓글 작성, 수정, 삭제<br>
 <br>
 
