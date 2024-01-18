@@ -1,18 +1,18 @@
-package com.teamsparta.kotlin.user.entity
+package com.teamsparta.kotlin.todolist.entity
 
-import com.sparta.techTree.common.model.BaseTimeEntity
-import com.teamsparta.kotlin.user.dto.UserResponse
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.teamsparta.kotlin.common.entity.BaseTimeEntity
 import jakarta.persistence.*
 
 @Entity
 @Table(
+    name = "users",
     uniqueConstraints = [UniqueConstraint(name = "uk_member_login_id", columnNames = ["email"])]
 )
-class User(
+class Users(
     email: String,
     password: String,
-    nickname: String,
-
+    nickname: String
 ): BaseTimeEntity(){
 
     @Id
@@ -28,16 +28,8 @@ class User(
     @Column(nullable = false, length = 10)
     var nickname= nickname
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "users")
+    @JsonIgnore
     val userRole: List<UserRoleEntity>? = null
 
-}
-
-fun User.toResponse(): UserResponse{
-    return UserResponse(
-        id = id!!,
-        email = email,
-        nickname = nickname,
-        createdAt = this.createdAt
-    )
 }

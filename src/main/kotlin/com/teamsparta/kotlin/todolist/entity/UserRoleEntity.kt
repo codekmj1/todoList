@@ -1,4 +1,4 @@
-package com.teamsparta.kotlin.user.entity
+package com.teamsparta.kotlin.todolist.entity
 
 import jakarta.persistence.*
 import org.hibernate.annotations.OnDelete
@@ -17,5 +17,5 @@ class UserRoleEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = ForeignKey(name = "fk_user_role_member_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
-    val user: User
+    val users: Users
 )

@@ -1,71 +1,101 @@
 package com.teamsparta.kotlin.todolist.controller
 
-import com.teamsparta.kotlin.todolist.dto.CommentDTO
-import com.teamsparta.kotlin.todolist.dto.TodoListDTO
-import com.teamsparta.kotlin.todolist.entity.Comment
-import com.teamsparta.kotlin.todolist.entity.Todo
+
+import com.teamsparta.kotlin.common.auth.JwtTokenProvider
+import com.teamsparta.kotlin.common.dto.CustomUser
+import com.teamsparta.kotlin.todolist.dto.commentsdto.CommentsResponse
+import com.teamsparta.kotlin.todolist.dto.commentsdto.CreateCommentsRequest
+import com.teamsparta.kotlin.todolist.dto.commentsdto.UpdateCommentsRequest
+import com.teamsparta.kotlin.todolist.dto.todosdto.CreateTodosRequest
+import com.teamsparta.kotlin.todolist.dto.todosdto.TodosResponse
+import com.teamsparta.kotlin.todolist.dto.todosdto.UpdateTodosRequest
 import com.teamsparta.kotlin.todolist.service.TodoListService
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.web.bind.annotation.*
 
-
 @RestController
-@RequestMapping("/api/todolist")
-class TodoListController(private val todoListService: TodoListService) {
-    @PostMapping
-    fun createTodoList(@RequestBody todoListDTO: TodoListDTO): ResponseEntity<Todo> {
-        val todoList = todoListService.createTodoList(todoListDTO)
-        return ResponseEntity(todoList, HttpStatus.CREATED)
+@RequestMapping("/api")
+class TodoListController(
+    private val todoListService: TodoListService,
+    private val jwtTokenProvider: JwtTokenProvider
+) {
+    @PostMapping("/todos")
+    fun createTodo(@RequestHeader("Authorization") authHeader: String,
+                   @RequestBody createTodoRequest: CreateTodosRequest): ResponseEntity<Map<String, Any>> {
+        val token = authHeader.removePrefix("Bearer ")
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw BadCredentialsException("Invalid token")
+        }
+        val userId = (jwtTokenProvider.getAuthentication(token).principal as CustomUser).id
+        val todo = todoListService.createTodo(createTodoRequest, userId)
+        val todoResponse = TodosResponse(todo.id, todo.title, todo.content, userId, todo.createdAt, todo.updatedAt)
+        return ResponseEntity.ok(mapOf("message" to "Todo created successfully.", "data" to todoResponse))
     }
 
-    @GetMapping("/{id}")
-    fun getTodoList(@PathVariable id: Long): ResponseEntity<Todo> {
-        val todoList = todoListService.getTodoList(id)
-        return ResponseEntity(todoList, HttpStatus.OK)
+    @PutMapping("/todos/{id}")
+    fun updateTodo(@RequestHeader("Authorization") authHeader: String,
+                   @RequestBody updateTodoRequest: UpdateTodosRequest,
+                   @PathVariable id: Long): ResponseEntity<Map<String, Any>> {
+        val token = authHeader.removePrefix("Bearer ")
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw BadCredentialsException("Invalid token")
+        }
+        val userId = (jwtTokenProvider.getAuthentication(token).principal as CustomUser).id
+        val todo = todoListService.updateTodo(updateTodoRequest, id, userId)
+        val todoResponse = TodosResponse(todo.id, todo.title, todo.content, userId, todo.createdAt, todo.updatedAt)
+        return ResponseEntity.ok(mapOf("message" to "Todo updated successfully.", "data" to todoResponse))
+    }
+    @DeleteMapping("/todos/{id}")
+    fun deleteTodo(@RequestHeader("Authorization") authHeader: String,
+                   @PathVariable id: Long): ResponseEntity<Map<String, Any>> {
+        val token = authHeader.removePrefix("Bearer ")
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw BadCredentialsException("Invalid token")
+        }
+        val userId = (jwtTokenProvider.getAuthentication(token).principal as CustomUser).id
+        todoListService.deleteTodo(id, userId)
+        return ResponseEntity.ok(mapOf("message" to "Todo deleted successfully."))
     }
 
-    @GetMapping
-    fun getAllTodoList(): ResponseEntity<List<Todo>> {
-        val todoList = todoListService.getAllTodoList()
-        return ResponseEntity(todoList, HttpStatus.OK)
+    @PostMapping("/todos/{todoId}/comments")
+    fun createComment(@RequestHeader("Authorization") authHeader: String,
+                      @RequestBody createCommentRequest: CreateCommentsRequest,
+                      @PathVariable todoId: Long): ResponseEntity<Map<String, Any>> {
+        val token = authHeader.removePrefix("Bearer ")
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw BadCredentialsException("Invalid token")
+        }
+        val userId = (jwtTokenProvider.getAuthentication(token).principal as CustomUser).id
+        val comment = todoListService.createComment(createCommentRequest, todoId, userId)
+        val commentResponse = CommentsResponse(comment.id, userId, todoId, comment.content, comment.createdAt, comment.updatedAt)
+        return ResponseEntity.ok(mapOf("message" to "Comment created successfully.", "data" to commentResponse))
     }
 
-    @PutMapping("/{id}")
-    fun updateTodoList(@PathVariable id: Long, @RequestBody todoListDTO: TodoListDTO): ResponseEntity<Todo> {
-        val updatedTodoList = todoListService.updateTodoList(id, todoListDTO)
-        return ResponseEntity(updatedTodoList, HttpStatus.OK)
+    @PutMapping("/todos/{todoId}/comments/{id}")
+    fun updateComment(@RequestHeader("Authorization") authHeader: String,
+                      @RequestBody updateCommentRequest: UpdateCommentsRequest,
+                      @PathVariable todoId: Long,
+                      @PathVariable id: Long): ResponseEntity<Map<String, Any>> {
+        val token = authHeader.removePrefix("Bearer ")
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw BadCredentialsException("Invalid token")
+        }
+        val userId = (jwtTokenProvider.getAuthentication(token).principal as CustomUser).id
+        val comment = todoListService.updateComment(updateCommentRequest, id, userId)
+        val commentResponse = CommentsResponse(comment.id, userId, todoId, comment.content, comment.createdAt, comment.updatedAt)
+        return ResponseEntity.ok(mapOf("message" to "Comment updated successfully.", "data" to commentResponse))
     }
-
-    @DeleteMapping("/{id}")
-    fun deleteTodoList(@PathVariable id: Long): ResponseEntity<Void> {
-        todoListService.deleteTodoList(id)
-        return ResponseEntity(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/todos/{todoId}/comments/{id}")
+    fun deleteComment(@RequestHeader("Authorization") authHeader: String,
+                      @PathVariable todoId: Long,
+                      @PathVariable id: Long): ResponseEntity<Map<String, Any>> {
+        val token = authHeader.removePrefix("Bearer ")
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw BadCredentialsException("Invalid token")
+        }
+        val userId = (jwtTokenProvider.getAuthentication(token).principal as CustomUser).id
+        todoListService.deleteComment(id, userId)
+        return ResponseEntity.ok(mapOf("message" to "Comment deleted successfully."))
     }
-    //완료 처리
-    @PutMapping("/{id}/complete")
-    fun completeTodoList(@PathVariable id: Long): ResponseEntity<Todo> {
-        val completedTodoList = todoListService.completeTodoList(id)
-        return ResponseEntity(completedTodoList, HttpStatus.OK)
-    }
-    //댓글
-    @PostMapping("/{id}/comments")
-    fun createComment(@PathVariable id: Long, @RequestBody commentDTO: CommentDTO): ResponseEntity<Comment> {
-        val comment = todoListService.createComment(id, commentDTO)
-        return ResponseEntity(comment, HttpStatus.CREATED)
-    }
-
-    @PutMapping("/comments/{id}")
-    fun updateComment(@PathVariable id: Long, @RequestBody commentDTO: CommentDTO): ResponseEntity<Comment> {
-        val updatedComment = todoListService.updateComment(id, commentDTO)
-        return ResponseEntity(updatedComment, HttpStatus.OK)
-    }
-
-    @DeleteMapping("/comments/{id}")
-    fun deleteComment(@PathVariable id: Long, @RequestBody commentDTO: CommentDTO): ResponseEntity<Void> {
-        todoListService.deleteComment(id, commentDTO)
-        return ResponseEntity(HttpStatus.NO_CONTENT)
-    }
-
 }
-

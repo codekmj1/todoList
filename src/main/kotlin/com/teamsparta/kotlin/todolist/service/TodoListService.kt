@@ -1,23 +1,18 @@
 package com.teamsparta.kotlin.todolist.service
 
-import com.teamsparta.kotlin.todolist.dto.CommentDTO
-import com.teamsparta.kotlin.todolist.dto.TodoListDTO
-import com.teamsparta.kotlin.todolist.entity.Comment
-import com.teamsparta.kotlin.todolist.entity.Todo
+import com.teamsparta.kotlin.todolist.dto.commentsdto.CreateCommentsRequest
+import com.teamsparta.kotlin.todolist.dto.commentsdto.UpdateCommentsRequest
+import com.teamsparta.kotlin.todolist.dto.todosdto.CreateTodosRequest
+import com.teamsparta.kotlin.todolist.dto.todosdto.UpdateTodosRequest
+import com.teamsparta.kotlin.todolist.entity.Comments
+import com.teamsparta.kotlin.todolist.entity.Todos
 
 interface TodoListService {
-    fun createTodoList(userId: Long, todoListDTO: TodoListDTO): Todo
-    fun getTodoList(id: Long): Todo
-    fun getAllTodoList(): List<Todo>
-    fun updateTodoList(id: Long, todoListDTO: TodoListDTO): Todo
-    fun deleteTodoList(id: Long)
+    fun createTodo(createTodoRequest: CreateTodosRequest, userId: Long): Todos
+    fun updateTodo(updateTodoRequest: UpdateTodosRequest, todoId: Long, userId: Long): Todos
+    fun createComment(createCommentRequest: CreateCommentsRequest, todoId: Long, userId: Long): Comments
+    fun updateComment(updateCommentRequest: UpdateCommentsRequest, commentId: Long, userId: Long): Comments
+    fun deleteTodo(todoId: Long, userId: Long)
+    fun deleteComment(commentId: Long, userId: Long)
 
-    //완료표시
-    fun completeTodoList(id: Long): Todo
-
-    //댓글
-    fun createComment(userId: Long, id: Long, commentDTO: CommentDTO): Comment
-    fun updateComment(id: Long, commentDTO: CommentDTO): Comment
-    fun deleteComment(id: Long, commentDTO: CommentDTO)
 }
-

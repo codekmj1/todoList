@@ -1,4 +1,4 @@
-package com.teamsparta.kotlin.user.dto
+package com.teamsparta.kotlin.todolist.dto
 
 
 data class SignUpRequest (

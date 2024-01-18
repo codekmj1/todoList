@@ -16,7 +16,7 @@ import java.util.*
 const val EXPIRATION_MILLISECONDS: Long = 1000 * 60 * 60 * 12
 
 @Component
-class JwtTokenProvider {
+class JwtTokenProvider{
     @Value("\${jwt.secret}")
     lateinit var secretKey: String
 

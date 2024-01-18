@@ -1,15 +1,16 @@
-package com.teamsparta.kotlin.user.service
+package com.teamsparta.kotlin.todolist.service
 
 import com.teamsparta.kotlin.common.auth.JwtTokenProvider
 import com.teamsparta.kotlin.common.auth.TokenInfo
 import com.teamsparta.kotlin.common.exception.InvalidInputException
-import com.teamsparta.kotlin.user.dto.LoginRequest
-import com.teamsparta.kotlin.user.dto.SignUpRequest
-import com.teamsparta.kotlin.user.entity.User
-import com.teamsparta.kotlin.user.entity.UserRole
-import com.teamsparta.kotlin.user.entity.UserRoleEntity
-import com.teamsparta.kotlin.user.repository.UserRepository
-import com.teamsparta.kotlin.user.repository.UserRoleRepository
+import com.teamsparta.kotlin.todolist.dto.LoginRequest
+import com.teamsparta.kotlin.todolist.dto.SignUpRequest
+import com.teamsparta.kotlin.todolist.dto.UserResponse
+import com.teamsparta.kotlin.todolist.entity.Users
+import com.teamsparta.kotlin.todolist.entity.UserRole
+import com.teamsparta.kotlin.todolist.entity.UserRoleEntity
+import com.teamsparta.kotlin.todolist.repository.UsersRepository
+import com.teamsparta.kotlin.todolist.repository.UsersRoleRepository
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -20,32 +21,32 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserServiceImpl(
-    private val userRepository: UserRepository,
-    private val userRoleRepository: UserRoleRepository,
+    private val userRepository: UsersRepository,
+    private val userRoleRepository: UsersRoleRepository,
     private val authenticationManagerBuilder: AuthenticationManagerBuilder,
     private val jwtTokenProvider: JwtTokenProvider,
 ) : UserService {
 
     @Transactional
-    override fun signUp(signUpRequest: SignUpRequest): String {
-        var user: User? = userRepository.findByEmail(signUpRequest.email)
-        if (user != null) {
+    override fun signUp(signUpRequest: SignUpRequest): UserResponse {
+        var users: Users? = userRepository.findByEmail(signUpRequest.email)
+        if (users != null) {
             throw InvalidInputException("email", "이미 등록된 email 입니다.")
         }
 
-        user = User(
+        users = Users(
             signUpRequest.email,
             createDelegatingPasswordEncoder().encode(signUpRequest.password),
             signUpRequest.nickname
         )
 
-        userRepository.save(user)
+        val savedUser = userRepository.save(users)
 
         //권한 저장
-        val userRole = UserRoleEntity(null, UserRole.MEMBER, user)
+        val userRole = UserRoleEntity(null, UserRole.MEMBER, users)
         userRoleRepository.save(userRole)
 
-        return "회원가입 완료"
+        return UserResponse(savedUser.id!!, savedUser.email, savedUser.nickname, savedUser.createdAt!!)
     }
 
     //로그인 토큰 발생
